@@ -1,7 +1,23 @@
 # write your code here
 from collections import Counter
-
 from typing import Dict, List, Tuple
+
+def create_frequency_mapping(encrypted_text: str) -> Dict[str, str]:
+    """Create initial substitution mapping based on frequency analysis."""
+    encrypted_freq = calculate_frequencies(encrypted_text)
+    english_order = "ETAOINSHRDLCUMWFGYPBVKJXQZ"  # English letters by frequency
+    
+    # Sort encrypted letters by frequency
+    encrypted_sorted = sorted(encrypted_freq.items(), key=lambda x: x[1], reverse=True)
+    
+    mapping = {}
+    for i, (encrypted_letter, _) in enumerate(encrypted_sorted):
+        if i < len(english_order):
+            mapping[encrypted_letter] = english_order[i]
+    
+    return mapping
+
+
 def calculate_frequencies(text: str) -> Dict[str, float]:
     """Calculate letter frequencies in the given text."""
     # Only count letters, ignore spaces
@@ -97,7 +113,7 @@ def main():
 
     print("📡 Loading signal data...")
     signal_data = load_signal("signal.txt")
-    print(signal_data)
+    #print(signal_data)
 
     if not signal_data:
             return
@@ -113,6 +129,15 @@ def main():
         print("❌ Could not find a suitable message candidate!")
         return
 
+
+    print(f"📍 Message located at position {position}")
+    print(f"🔤 First 50 characters: {encrypted_message[:50]}...")
+    
+
+    # Step 3: Create initial frequency-based mapping
+    print("\n🧮 Phase 2: Creating frequency-based substitution mapping...")
+    initial_mapping = create_frequency_mapping(encrypted_message)
+    
 
 
 if __name__ == "__main__":
