@@ -3,6 +3,22 @@ import re
 from collections import Counter
 from typing import Dict, List, Tuple
 
+def validate_solution(decrypted_text: str, expected_top_10: str = "EATOIRSNHU") -> bool:
+    """Validate that the solution matches the expected frequency pattern."""
+    frequencies = calculate_frequencies(decrypted_text)
+    sorted_letters = sorted(frequencies.items(), key=lambda x: x[1], reverse=True)
+    
+    if len(sorted_letters) < 10:
+        return False
+    
+    actual_top_10 = ''.join([letter for letter, _ in sorted_letters[:10]])
+    
+    print(f"📊 Expected top 10: {expected_top_10}")
+    print(f"📊 Actual top 10:   {actual_top_10}")
+    
+    # Check if at least 7 out of 10 match (allowing for some variation)
+    matches = sum(1 for a, b in zip(actual_top_10, expected_top_10) if a == b)
+    return matches >= 7
 
 def refine_mapping_with_patterns(encrypted_text: str, initial_mapping: Dict[str, str]) -> Dict[str, str]:
     """Refine the mapping using common English word patterns."""
@@ -209,6 +225,39 @@ def main():
     refined_mapping = refine_mapping_with_patterns(encrypted_message, initial_mapping)
     final_decrypted = apply_substitution(encrypted_message, refined_mapping)
     
+    # Step 6: Validate solution
+    print("\n✅ Phase 5: Validating solution...")
+    is_valid = validate_solution(final_decrypted)
+    
+    if is_valid:
+        print("🎉 SUCCESS! Message successfully decrypted!")
+    else:
+        print("⚠️  Warning: Frequency validation didn't fully match expected pattern")
+        print("   (This might still be correct - continuing with result)")
+    
+    # Step 7: Extract and display results
+    print("\n📜 DECRYPTED MESSAGE:")
+    print("=" * 70)
+    print(final_decrypted)
+    print("=" * 70)
+    
+    # Extract first 9 words for submission
+    words = final_decrypted.split()
+    first_nine_words = ' '.join(words[:9]) if len(words) >= 9 else ' '.join(words)
+    
+    print(f"\n🎯 FIRST 9 WORDS FOR SUBMISSION:")
+    print(f"➤ {first_nine_words}")
+
+
+    print(f"\n📊 FINAL STATISTICS:")
+    print(f"   • Message length: {len(final_decrypted)} characters")
+    print(f"   • Word count: {len(words)} words")
+    print(f"   • Located at position: {position}")
+    
+    # Show final frequency analysis
+    final_freq = calculate_frequencies(final_decrypted)
+    top_letters = sorted(final_freq.items(), key=lambda x: x[1], reverse=True)[:10]
+    print(f"   • Top 10 letters: {''.join([letter for letter, _ in top_letters])}")
 
 if __name__ == "__main__":
     main() 
