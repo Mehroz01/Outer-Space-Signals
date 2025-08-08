@@ -2,6 +2,16 @@
 from collections import Counter
 from typing import Dict, List, Tuple
 
+def apply_substitution(text: str, mapping: Dict[str, str]) -> str:
+    """Apply the substitution mapping to decrypt text."""
+    result = ""
+    for char in text:
+        if char in mapping:
+            result += mapping[char]
+        else:
+            result += char  # Keep spaces and unknown characters
+    return result
+
 def create_frequency_mapping(encrypted_text: str) -> Dict[str, str]:
     """Create initial substitution mapping based on frequency analysis."""
     encrypted_freq = calculate_frequencies(encrypted_text)
@@ -137,6 +147,17 @@ def main():
     # Step 3: Create initial frequency-based mapping
     print("\n🧮 Phase 2: Creating frequency-based substitution mapping...")
     initial_mapping = create_frequency_mapping(encrypted_message)
+    
+    print("📋 Initial mapping (top 10):")
+    sorted_mapping = sorted(initial_mapping.items(), key=lambda x: calculate_frequencies(encrypted_message).get(x[0], 0), reverse=True)
+    for i, (enc, dec) in enumerate(sorted_mapping[:10]):
+        freq = calculate_frequencies(encrypted_message).get(enc, 0)
+        print(f"   {enc} → {dec} (frequency: {freq:.1f}%)")
+    
+        # Step 4: Apply initial decryption
+    print("\n🔓 Phase 3: Applying initial decryption...")
+    decrypted_v1 = apply_substitution(encrypted_message, initial_mapping)
+    print(f"🔤 Initial result: {decrypted_v1[:100]}...")
     
 
 
