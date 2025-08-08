@@ -258,6 +258,7 @@ def main():
     final_freq = calculate_frequencies(final_decrypted)
     top_letters = sorted(final_freq.items(), key=lambda x: x[1], reverse=True)[:10]
     print(f"   • Top 10 letters: {''.join([letter for letter, _ in top_letters])}")
+    print("\n🚀 Mission Complete! The message from Planet Dyslexia has been decoded!")
 
 if __name__ == "__main__":
     main() 
