@@ -1,6 +1,49 @@
 # write your code here
+import re
 from collections import Counter
 from typing import Dict, List, Tuple
+
+
+def refine_mapping_with_patterns(encrypted_text: str, initial_mapping: Dict[str, str]) -> Dict[str, str]:
+    """Refine the mapping using common English word patterns."""
+    mapping = initial_mapping.copy()
+    
+    # Apply initial mapping
+    decrypted = apply_substitution(encrypted_text, mapping)
+    
+    # Look for common patterns and adjust
+    common_words = {
+        'THE': ['THE', 'TGE', 'TCE', 'TAE'],  # Common misspellings/variants to look for
+        'AND': ['AND', 'AID', 'ANO'],
+        'FOR': ['FOR', 'FAR', 'FER'],
+        'ARE': ['ARE', 'ATE', 'APE'],
+        'YOU': ['YOU', 'YAU', 'YEU'],
+        'ALL': ['ALL', 'AII', 'ALI'],
+        'BUT': ['BUT', 'BET', 'BOT'],
+        'NOT': ['NOT', 'NAT', 'NET'],
+        'CAN': ['CAN', 'CAI', 'CEI'],
+        'HAD': ['HAD', 'GAD', 'HED']
+    }
+    
+    # Count potential matches for each pattern
+    words_in_text = decrypted.split()
+    
+    for target_word, variants in common_words.items():
+        for word in words_in_text:
+            if len(word) == len(target_word):
+                # Check if this could be the target word with minor adjustments
+                differences = sum(1 for a, b in zip(word, target_word) if a != b)
+                if differences == 1:  # Only one letter different
+                    # Find the different positions and update mapping
+                    for i, (encrypted_char, target_char) in enumerate(zip(word, target_word)):
+                        if encrypted_char != target_char:
+                            # Find original encrypted character
+                            for enc_char, dec_char in mapping.items():
+                                if dec_char == encrypted_char:
+                                    mapping[enc_char] = target_char
+                                    break
+    
+    return mapping
 
 def apply_substitution(text: str, mapping: Dict[str, str]) -> str:
     """Apply the substitution mapping to decrypt text."""
@@ -160,6 +203,12 @@ def main():
     print(f"🔤 Initial result: {decrypted_v1[:100]}...")
     
 
+
+    # Step 5: Refine mapping using patterns
+    print("\n🎯 Phase 4: Refining with common English patterns...")
+    refined_mapping = refine_mapping_with_patterns(encrypted_message, initial_mapping)
+    final_decrypted = apply_substitution(encrypted_message, refined_mapping)
+    
 
 if __name__ == "__main__":
     main() 
