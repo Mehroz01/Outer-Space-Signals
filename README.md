@@ -1,52 +1,42 @@
-# Signals from Outer Space
 
-## Getting Started
+# NASA Signal Decoder Challenge – My Solution
 
-**Important: Do not directly clone this repository!**
+## First 9 Words
 
-To work on this challenge, please follow these steps:
+**\[WE HAVE ENCOUNTERED SIJNIFICANT DIFFICUXTP LROCESSINJ THE AUDITORP EMISSIONS]**
 
-1. **Fork this repository** to your own GitHub account by clicking the "Fork" button at the top right of this repository page
-2. **Clone your forked repository** to your local machine:
+---
 
-   ```bash
-   git clone https://github.com/YOUR_USERNAME/Outer-Space-Signals.git
-   ```
+## Approach
 
-3. Work on the challenge in your forked repository
-4. Submit your solution by providing a link to your forked repository
+The challenge was to locate and decode a 721-character alien message buried somewhere in 64KB of noisy signal data. The decoded text had to follow a very specific letter frequency order:
+**E A T O I R S N H U** (most to least common).
 
-This ensures that your work is properly attributed to you and prevents conflicts with the original repository.
+### Early Attempts (a.k.a. “How I Got Nowhere Fast”)
 
-## Directory Structure
+1. **Simple frequency mapping** – Just mapped the most common cipher letter to `E`, next to `A`, and so on.
+   → The result looked like my cat walked across the keyboard.
+2. **Word shape matching** – Tried matching letter patterns (e.g., “THAT” → ABCA).
+   → Found a few words but still unreadable overall.
+3. **Genetic algorithm** – Let random “solutions” breed and mutate.
+   → Way too slow, and got stuck on nonsense.
 
-```text
-.
-├── README.md -- Challenge intrustions 
-├── signal.txt -- file containing raw signals. 
-└── src
-    └── main.py -- code file
-```
+### What Finally Worked
 
+After some trial and error, I built a combined strategy:
 
-## The Challenge
+1. **Smart Sampling**
+   Instead of testing every single starting position, I sampled every 50th position to cut runtime.
+2. **Initial Frequency Mapping**
+   Used letter frequencies in each sampled window to make a decent first guess.
+3. **Hill Climbing**
+   Swapped letter pairs and kept changes that improved the score.
+4. **Scoring Function**
 
-It’s finally happened. Earth’s radio waves have reached other sentient creatures far out in the universe, reaching the planet Dyslexia. They have reversed engineered English from our transmissions and have sent us a message of their own, which has been received together with other random space noise.  Unfortunately, the Dyslexians have substituted all the letters of the English language for other letters.  
+   * Rewarded common English words (+7–15 points)
+   * Bonus for common digrams like `TH`, `HE` (+0.25 each)
+   * Penalized vowel-less words (–3 points)
+   * Gave a **+100 bonus** if the decoded text matched the exact required frequency pattern.
+5. **Multiple Restarts**
+   Ran the hill climb 40 times with different initial maps to escape bad starting points.
 
-For example (this is not the substitution, only an example) H to B, E to P, L to Q, O to M, so the word HELLO, would look like BPQQM. Fortunately, they have left spaces intact, so “BPQQM OMNCU” would be “HELLO WORLD”.
-
-As NASA’s finest Pythonist, they have sent the gabled message to your office (a converted broom closet in Nasa’s utility building situated 3KM from the main campus). It is your responsibility to decipher this signal.
-
-+ The Signal (see attachment) contains 64 KB of English uppercase letters and spaces.
-
-+ The message is placed at a random place within the 64KB of text.
-
-+ The length of the message is known, it’s 721 characters long.
-
-+ The message is a substitution cipher encrypted English. The substitutions are stable (1 source letter maps to 1 destination letter).
-
-+ The substitutions mapping is not known.
-
-+ The top 10 English letters in the deciphered text by frequency is: E A T O I R S N H U
-
-Add the first 9 words from the deciphered message to the top of your proposal. You get additional points for describing the process and well (human!) written python source code used to decipher.
